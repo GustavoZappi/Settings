@@ -1,6 +1,10 @@
 import React from "react";
+import { Typography, Layout } from "antd";
 import MetricsOverview from "./settings/MetricsOverview";
 import ClassificationTable from "./settings/ClassificationTable";
+
+const { Content } = Layout;
+const { Title } = Typography;
 
 interface HomeProps {
   pageTitle?: string;
@@ -8,20 +12,31 @@ interface HomeProps {
 
 const Home = ({ pageTitle = "Settings Dashboard" }: HomeProps) => {
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header Section */}
-        <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow">
-          <h1 className="text-2xl font-bold">{pageTitle}</h1>
+    <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+      <Content style={{ padding: 24 }}>
+        <div style={{ maxWidth: 1400, margin: "0 auto" }}>
+          {/* Header Section */}
+          <div
+            style={{
+              background: "#fff",
+              padding: 24,
+              borderRadius: 8,
+              marginBottom: 24,
+            }}
+          >
+            <Title level={2} style={{ margin: 0 }}>
+              {pageTitle}
+            </Title>
+          </div>
+
+          {/* Metrics Overview Section */}
+          <MetricsOverview />
+
+          {/* Classification Table Section */}
+          <ClassificationTable />
         </div>
-
-        {/* Metrics Overview Section */}
-        <MetricsOverview />
-
-        {/* Classification Table Section */}
-        <ClassificationTable />
-      </div>
-    </div>
+      </Content>
+    </Layout>
   );
 };
 

@@ -1,15 +1,8 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Label } from "../ui/label";
-import { cn } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { Modal, Select, Button, Space, Typography, Divider } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+
+const { Title } = Typography;
 
 interface RuleConfigurationModalProps {
   isOpen?: boolean;
@@ -50,42 +43,32 @@ const MANAGED_TYPES = [
 const PRODUCTIVITY_LEVELS = ["Productive", "Non-Productive", "Neutral"];
 const SCOPE_TYPES = ["Organization", "Sector", "Department", "Cost Center"];
 
-interface SelectButtonGroupProps {
-  label: string;
-  options: string[];
-  value: string;
-  onChange: (value: string) => void;
-  disabled?: boolean;
-}
-
 const SelectButtonGroup = ({
   label,
   options,
   value,
   onChange,
-  disabled = false,
-}: SelectButtonGroupProps) => (
-  <div className="space-y-2">
-    <Label>{label}</Label>
-    <div className="flex flex-wrap gap-2">
+}: {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+}) => (
+  <div style={{ marginBottom: 16 }}>
+    <Typography.Text strong style={{ display: "block", marginBottom: 8 }}>
+      {label}
+    </Typography.Text>
+    <Space wrap>
       {options.map((option) => (
         <Button
           key={option}
-          variant="outline"
-          size="sm"
-          className={cn(
-            "flex-1 min-w-[120px]",
-            value === option
-              ? "bg-primary text-primary-foreground hover:bg-primary/90"
-              : "",
-          )}
+          type={value === option ? "primary" : "default"}
           onClick={() => onChange(option)}
-          disabled={disabled}
         >
           {option}
         </Button>
       ))}
-    </div>
+    </Space>
   </div>
 );
 
@@ -110,152 +93,139 @@ const RuleConfigurationModal = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl bg-white">
-        <DialogHeader>
-          <DialogTitle>Editing google.com</DialogTitle>
-        </DialogHeader>
+    <Modal
+      title="Editing google.com"
+      open={isOpen}
+      onCancel={onClose}
+      width={1000}
+      footer={[
+        <Button key="cancel" onClick={onClose}>
+          Cancel
+        </Button>,
+        <Button key="save" type="primary" onClick={onClose}>
+          Save Changes
+        </Button>,
+      ]}
+    >
+      <div style={{ padding: "20px 0" }}>
+        <SelectButtonGroup
+          label="App Type"
+          options={APP_TYPES}
+          value={appType}
+          onChange={setAppType}
+        />
 
-        <div className="space-y-6 py-4">
-          <SelectButtonGroup
-            label="App Type"
-            options={APP_TYPES}
-            value={appType}
-            onChange={setAppType}
-          />
+        <SelectButtonGroup
+          label="Risk Level"
+          options={RISK_LEVELS}
+          value={riskLevel}
+          onChange={setRiskLevel}
+        />
 
-          <SelectButtonGroup
-            label="Risk Level"
-            options={RISK_LEVELS}
-            value={riskLevel}
-            onChange={setRiskLevel}
-          />
+        <SelectButtonGroup
+          label="Management Type"
+          options={MANAGED_TYPES}
+          value={managedType}
+          onChange={setManagedType}
+        />
 
-          <SelectButtonGroup
-            label="Management Type"
-            options={MANAGED_TYPES}
-            value={managedType}
-            onChange={setManagedType}
-          />
+        <SelectButtonGroup
+          label="Approval Status"
+          options={APPROVAL_STATUS}
+          value={approvalStatus}
+          onChange={setApprovalStatus}
+        />
 
-          <SelectButtonGroup
-            label="Approval Status"
-            options={APPROVAL_STATUS}
-            value={approvalStatus}
-            onChange={setApprovalStatus}
-          />
+        <Divider />
 
-          {/* Productivity Rules */}
-          <div className="space-y-4">
-            <Label>Productivity rules for google.com</Label>
-            {productivityRules.map((rule, index) => (
-              <div key={index} className="flex items-center gap-4 py-2">
-                <Select
-                  value={rule.productivityLevel}
-                  onValueChange={(value) => {
-                    const newRules = [...productivityRules];
-                    newRules[index].productivityLevel = value;
-                    setProductivityRules(newRules);
-                  }}
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select productivity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PRODUCTIVITY_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {level}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <span className="text-sm text-gray-500">For the</span>
-
-                <Select
-                  value={rule.scope}
-                  onValueChange={(value) => {
-                    const newRules = [...productivityRules];
-                    newRules[index].scope = value;
-                    newRules[index].scopeValue = ""; // Reset scope value when scope changes
-                    setProductivityRules(newRules);
-                  }}
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select scope" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SCOPE_TYPES.map((scope) => (
-                      <SelectItem key={scope} value={scope}>
-                        {scope}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={rule.scopeValue}
-                  onValueChange={(value) => {
-                    const newRules = [...productivityRules];
-                    newRules[index].scopeValue = value;
-                    setProductivityRules(newRules);
-                  }}
-                  disabled={rule.scope === "Organization"}
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select value" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {rule.scope === "Sector" && [
-                      <SelectItem key="marketing" value="Marketing">
-                        Marketing
-                      </SelectItem>,
-                      <SelectItem key="sales" value="Sales">
-                        Sales
-                      </SelectItem>,
-                      <SelectItem key="engineering" value="Engineering">
-                        Engineering
-                      </SelectItem>,
-                    ]}
-                    {rule.scope === "Department" && [
-                      <SelectItem key="it" value="IT">
-                        IT
-                      </SelectItem>,
-                      <SelectItem key="hr" value="HR">
-                        HR
-                      </SelectItem>,
-                    ]}
-                    {rule.scope === "Cost Center" && [
-                      <SelectItem key="cc1" value="CC1">
-                        CC1
-                      </SelectItem>,
-                      <SelectItem key="cc2" value="CC2">
-                        CC2
-                      </SelectItem>,
-                    ]}
-                  </SelectContent>
-                </Select>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={addProductivityRule}
+        <div>
+          <Title level={5}>Productivity rules for google.com</Title>
+          {productivityRules.map((rule, index) => (
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                gap: 16,
+                alignItems: "center",
+                marginBottom: 16,
+              }}
             >
-              Add Productivity Rule
-            </Button>
-          </div>
+              <Select
+                style={{ width: 200 }}
+                value={rule.productivityLevel}
+                onChange={(value) => {
+                  const newRules = [...productivityRules];
+                  newRules[index].productivityLevel = value;
+                  setProductivityRules(newRules);
+                }}
+                placeholder="Select productivity"
+                options={PRODUCTIVITY_LEVELS.map((level) => ({
+                  label: level,
+                  value: level,
+                }))}
+              />
 
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button onClick={onClose}>Save Changes</Button>
-          </div>
+              <Typography.Text>For the</Typography.Text>
+
+              <Select
+                style={{ width: 200 }}
+                value={rule.scope}
+                onChange={(value) => {
+                  const newRules = [...productivityRules];
+                  newRules[index].scope = value;
+                  newRules[index].scopeValue = "";
+                  setProductivityRules(newRules);
+                }}
+                placeholder="Select scope"
+                options={SCOPE_TYPES.map((scope) => ({
+                  label: scope,
+                  value: scope,
+                }))}
+              />
+
+              <Select
+                style={{ width: 200 }}
+                value={rule.scopeValue}
+                onChange={(value) => {
+                  const newRules = [...productivityRules];
+                  newRules[index].scopeValue = value;
+                  setProductivityRules(newRules);
+                }}
+                placeholder="Select value"
+                disabled={rule.scope === "Organization"}
+                options={
+                  rule.scope === "Sector"
+                    ? [
+                        { label: "Marketing", value: "Marketing" },
+                        { label: "Sales", value: "Sales" },
+                        { label: "Engineering", value: "Engineering" },
+                      ]
+                    : rule.scope === "Department"
+                      ? [
+                          { label: "IT", value: "IT" },
+                          { label: "HR", value: "HR" },
+                        ]
+                      : rule.scope === "Cost Center"
+                        ? [
+                            { label: "CC1", value: "CC1" },
+                            { label: "CC2", value: "CC2" },
+                          ]
+                        : []
+                }
+              />
+            </div>
+          ))}
+          <Button
+            type="dashed"
+            onClick={addProductivityRule}
+            style={{ width: "100%" }}
+            icon={<PlusOutlined />}
+          >
+            Add Productivity Rule
+          </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </Modal>
   );
 };
 
