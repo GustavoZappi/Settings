@@ -2,26 +2,40 @@ import React from "react";
 import { Card, Row, Col, Typography, Statistic } from "antd";
 import {
   BarChartOutlined,
-  PieChartOutlined,
-  BoxPlotOutlined,
   AppstoreOutlined,
+  BoxPlotOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 
 const { Title } = Typography;
 
 interface MetricsOverviewProps {
   totalUrls?: number;
-  saasPercentage?: number;
+  saasQuantity?: number;
   riskLevels?: { high: number; medium: number; low: number };
-  appTypes?: { internal: number; external: number; unknown: number };
+  configuredSaasPercentage?: number;
 }
 
 const MetricsOverview = ({
   totalUrls = 1250,
-  saasPercentage = 65,
+  saasQuantity = 815,
   riskLevels = { high: 15, medium: 45, low: 40 },
-  appTypes = { internal: 30, external: 60, unknown: 10 },
+  configuredSaasPercentage = 78,
 }: MetricsOverviewProps) => {
+  const cardStyle = {
+    height: "100%",
+    display: "flex",
+    flexDirection: "column" as const,
+    justifyContent: "center",
+  };
+
+  const statisticStyle = {
+    display: "flex",
+    flexDirection: "column" as const,
+    height: "100%",
+    justifyContent: "center",
+  };
+
   return (
     <div style={{ marginBottom: 24 }}>
       <Title level={4} style={{ marginBottom: 16 }}>
@@ -29,48 +43,50 @@ const MetricsOverview = ({
       </Title>
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
+          <Card style={cardStyle}>
             <Statistic
               title="Total URLs"
               value={totalUrls}
               prefix={<BoxPlotOutlined />}
               suffix="URLs"
+              style={statisticStyle}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
+          <Card style={cardStyle}>
             <Statistic
-              title="SaaS URL %"
-              value={saasPercentage}
-              prefix={<PieChartOutlined />}
-              suffix="%"
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
-              title="Risk Level Distribution"
-              value={riskLevels.high}
-              prefix={<BarChartOutlined />}
-              suffix="% High Risk"
-            />
-            <div style={{ fontSize: 12, color: "#8c8c8c", marginTop: 4 }}>
-              {riskLevels.medium}% Medium, {riskLevels.low}% Low Risk
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
-              title="Application Types"
-              value={appTypes.external}
+              title="SaaS Discovered"
+              value={saasQuantity}
               prefix={<AppstoreOutlined />}
-              suffix="% External"
+              suffix="Apps"
+              style={statisticStyle}
             />
-            <div style={{ fontSize: 12, color: "#8c8c8c", marginTop: 4 }}>
-              {appTypes.internal}% Internal, {appTypes.unknown}% Unknown
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card style={cardStyle}>
+            <Statistic
+              title="Configured SaaS"
+              value={configuredSaasPercentage}
+              prefix={<CheckCircleOutlined />}
+              suffix="%"
+              style={statisticStyle}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card style={cardStyle}>
+            <div style={statisticStyle}>
+              <Statistic
+                title="Risk Level Distribution"
+                value={riskLevels.high}
+                prefix={<BarChartOutlined />}
+                suffix="% High Risk"
+              />
+              <div style={{ fontSize: 12, color: "#8c8c8c", marginTop: 4 }}>
+                {riskLevels.medium}% Medium, {riskLevels.low}% Low Risk
+              </div>
             </div>
           </Card>
         </Col>
